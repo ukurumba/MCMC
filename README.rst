@@ -17,6 +17,9 @@ MCMC
      :target: https://pyup.io/repos/github/ukurumba/MCMC/
      :alt: Updates
 
+.. image:: https://codecov.io/gh/ukurumba/MCMC/branch/master/graph/badge.svg
+		:target: https://codecov.io/gh/ukurumba/MCMC
+
 
 Uses Metropolis-Hastings algorithm and Markov chain Monte Carlo method to compute an equilibrium distribution for states given a probability distribution. 
 
