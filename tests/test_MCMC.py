@@ -11,6 +11,7 @@ Tests for `MCMC` module.
 
 import sys
 import unittest
+import numpy as np
 
 from MCMC import MCMC
 
@@ -27,16 +28,31 @@ class TestMcmc(unittest.TestCase):
     def test_000_something(self):
         pass
 
-    def test_candidate_generator(self):
-    	def test_q(i):
-    		return 3*i + 12
-    	candidate = MCMC.q(test_q,2)
-    	self.assertEqual(candidate,18)
+    def test_candidate_symmetry(self):
+    	Current_graph = [[0,1,1],[1,0,0],[1,0,0]]
+    	grid = [[1.0,4.0],[3.0,7.0],[14.0,28.0]]
+    	candidate = MCMC.q(Current_graph,grid)
+    	val = np.allclose(candidate, np.transpose(candidate))
+    	self.assertTrue(val)
 
-    # def test_alpha_actually_minimizes(self):
-    # 	eq_distrib = [.2,.3,.2,.7]
+    # def test_candidate_connected(self):
+    # 	Current_graph = [[0,1,1],[1,0,0],[1,0,0]]
+    # 	grid = [[1.0,4.0],[3.0,7.0],[14.0,28.0]]
+    # 	States = np.array([0,1,2])
+    # 	candidate = MCMC.q(Current_graph,grid)
     	
-    # 	probability = MCMC
+
+    def test_actual_change(self):
+    	Current_graph = [[0,1,1],[1,0,0],[1,0,0]]
+    	grid = [[1.0,4.0],[3.0,7.0],[14.0,28.0]]
+    	candidate = MCMC.q(Current_graph)
+    	np.assertNotEqual(candidate-Current_graph,np.zeroes((3,3)))
+
+    def test_theta(self):
+    	Current_graph = [[0,1,1],[1,0,0],[1,0,0]]
+    	States = np.array([0,1,2])
+
+
 
 
 
