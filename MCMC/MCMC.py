@@ -52,7 +52,7 @@ def q(i,grid):
 
 
 
-def theta(i,grid,r=1):
+def theta(i,r=1):
 	"""This function calculates the value of theta for the given state. Theta is a function defined in the problem statement.
 
 	Example
@@ -78,8 +78,16 @@ def theta(i,grid,r=1):
 		This is the theta value for the given state."""
 
 	total_weight = np.sum(np.array(i))
+	partial_weight = 0
+	for v in len(i):
+		path = dijkstra(np.array(i),v)
+		for node in range(0,len(path)-1,1):
+			partial_weight += i[path[node],path[node+1]]
+	return(r * total_weight + partial_weight)
 
-def dijkstra(i):
+
+
+def dijkstra(i,desired_node):
 	"""An implementation of Dijkstra's shortest path algorithm. 
 	Used pseudocode from http://www.gitta.info/Accessibiliti/en/html/Dijkstra_learningObject1.html."""
 	import math
@@ -106,7 +114,7 @@ def dijkstra(i):
 	return previous
 
 
-def probability(i,j):
+def probability(i,j,T=1):
 	"""This function computes the probability that the candidate state will be selected.
 
 	Example
@@ -125,11 +133,18 @@ def probability(i,j):
 	j : MxM array
 		This is the candidate graph represented by its adjacency matrix.
 
+	T : float
+		This is a parameter that can be tuned to improve the MCMC efficiency.
+
 	Output
 	------
 
 	prob : float
 		This is the probability that the candidate graph is selected. It takes values on [0,1]."""
+
+	theta_i = theta(i)
+	theta_j = theta(j)
+	return(np.exp(-(theta_j - theta_i)/T))
 
 def next_state(i,j,probability):
 	""" This function returns the next state using functions already defined.
@@ -156,6 +171,8 @@ def next_state(i,j,probability):
 
 	state : integer
 		the state chosen"""
+
+	
 
 def iterator(i,eq_distrib,N):
 	"""This is the main body of the implemented algorithm. This ignores the burn-off at the beginning of the simulation.
