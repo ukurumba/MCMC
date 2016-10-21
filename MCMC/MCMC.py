@@ -70,38 +70,38 @@ def q(i,grid):
 	return candidate
 
 
-def theta(i,r=1):
-	"""This function calculates the value of theta for the given state. Theta is a function defined in the problem statement.
+# def theta(i,r=1):
+# 	"""This function calculates the value of theta for the given state. Theta is a function defined in the problem statement.
 
-	Example
-	-------
+# 	Example
+# 	-------
 
-	i = [[1,0],[0,1]]
-	weights = [[1,2],[3,4]]
-	value = theta(i,weights)
+# 	i = [[1,0],[0,1]]
+# 	weights = [[1,2],[3,4]]
+# 	value = theta(i,weights)
 
-	Parameters
-	----------
+# 	Parameters
+# 	----------
 
-	i : MxM array
-		This is the current state represented in an MxM adjacency matrix.
+# 	i : MxM array
+# 		This is the current state represented in an MxM adjacency matrix.
 
-	grid : Mx2 array
-		This is the array of x and y values in Cartesian space for the given index/label (i.e. the individual column headers in the 'i array.')
+# 	grid : Mx2 array
+# 		This is the array of x and y values in Cartesian space for the given index/label (i.e. the individual column headers in the 'i array.')
 
-	Output
-	------
+# 	Output
+# 	------
 
-	value : integer
-		This is the theta value for the given state."""
+# 	value : integer
+# 		This is the theta value for the given state."""
 
-	total_weight = np.sum(np.array(i))
-	partial_weight = 0
-	for v in len(i):
-		path = dijkstra(np.array(i),v)
-		for node in range(0,len(path)-1,1):
-			partial_weight += i[path[node],path[node+1]]
-	return(r * total_weight + partial_weight)
+# 	total_weight = np.sum(np.array(i))
+# 	partial_weight = 0
+# 	for v in len(i):
+# 		path = dijkstra(np.array(i),v)
+# 		for node in range(0,len(path)-1,1):
+# 			partial_weight += i[path[node],path[node+1]]
+# 	return(r * total_weight + partial_weight)
 
 
 
@@ -132,100 +132,100 @@ def theta(i,r=1):
 # 	return previous
 
 
-def probability(i,j,T=1):
-	"""This function computes the probability that the candidate state will be selected.
+# def probability(i,j,T=1):
+# 	"""This function computes the probability that the candidate state will be selected.
 
-	Example
-	-------
+# 	Example
+# 	-------
 
-	i = [[1,0],[0,1]]
-	j = [[0,1],[1,0]]
-	prob = probability(i,j)
+# 	i = [[1,0],[0,1]]
+# 	j = [[0,1],[1,0]]
+# 	prob = probability(i,j)
 
-	Parameters
-	----------
+# 	Parameters
+# 	----------
 
-	i : MxM array
-		This is the current graph represented by its adjacency matrix.
+# 	i : MxM array
+# 		This is the current graph represented by its adjacency matrix.
 
-	j : MxM array
-		This is the candidate graph represented by its adjacency matrix.
+# 	j : MxM array
+# 		This is the candidate graph represented by its adjacency matrix.
 
-	T : float
-		This is a parameter that can be tuned to improve the MCMC efficiency.
+# 	T : float
+# 		This is a parameter that can be tuned to improve the MCMC efficiency.
 
-	Output
-	------
+# 	Output
+# 	------
 
-	prob : float
-		This is the probability that the candidate graph is selected. It takes values on [0,1]."""
+# 	prob : float
+# 		This is the probability that the candidate graph is selected. It takes values on [0,1]."""
 
-	theta_i = theta(i)
-	theta_j = theta(j)
-	return(np.exp(-(theta_j - theta_i)/T))
+# 	theta_i = theta(i)
+# 	theta_j = theta(j)
+# 	return(np.exp(-(theta_j - theta_i)/T))
 
-def next_state(i,j,probability):
-	""" This function returns the next state using functions already defined.
+# def next_state(i,j,probability):
+# 	""" This function returns the next state using functions already defined.
 
-	Example
-	-------
+# 	Example
+# 	-------
 
-	state = next_state(2,3,.4)
+# 	state = next_state(2,3,.4)
 
-	Parameters
-	----------
+# 	Parameters
+# 	----------
 
-	i : integer
-		the current state
+# 	i : integer
+# 		the current state
 	
-	j : integer
-		the candidate state
+# 	j : integer
+# 		the candidate state
 
-	probability : float
-		the probability that state j is selected
+# 	probability : float
+# 		the probability that state j is selected
 
-	Output 
-	------
+# 	Output 
+# 	------
 
-	state : integer
-		the state chosen"""
+# 	state : integer
+# 		the state chosen"""
 
 
 
-def iterator(i,eq_distrib,N):
-	"""This is the main body of the implemented algorithm. This ignores the burn-off at the beginning of the simulation.
+# def iterator(i,eq_distrib,N):
+# 	"""This is the main body of the implemented algorithm. This ignores the burn-off at the beginning of the simulation.
 
-	Example
-	-------
-	n = (0,1,2)
-	eq_distrib = (.4,.5,.1)
-	N = 1000
-	i = 2
-	X, P = iterator(i,eq_distrib,N)
-	print(X)
-	print(P)
+# 	Example
+# 	-------
+# 	n = (0,1,2)
+# 	eq_distrib = (.4,.5,.1)
+# 	N = 1000
+# 	i = 2
+# 	X, P = iterator(i,eq_distrib,N)
+# 	print(X)
+# 	print(P)
 
-	Parameters
-	----------
+# 	Parameters
+# 	----------
 
-	i : integer
-		the first state of the particle
+# 	i : integer
+# 		the first state of the particle
 
-	eq_distrib : 1-D array
-		the equilibrium probability distribution of the n states in the state space
+# 	eq_distrib : 1-D array
+# 		the equilibrium probability distribution of the n states in the state space
 
-	N : the number of iterations desired
+# 	N : the number of iterations desired
 
-	Output
-	------
+# 	Output
+# 	------
 
-	X : array of integers
-		the record of all the states the Markov chain took
-	P : nxn array of floats
-		the transition probability matrix.
-		"""
+# 	X : array of integers
+# 		the record of all the states the Markov chain took
+# 	P : nxn array of floats
+# 		the transition probability matrix.
+# 		"""
 
-	import numpy as np
+# 	import numpy as np
 
 
 
