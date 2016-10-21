@@ -28,8 +28,8 @@ def q(i,grid):
 
 	Example
 	-------
-	n = (0,1,2)
-	i = 1
+	grid = [(1,2),(2,3),(4,5)]
+	i = [[0,4,6],[2,0,9],[7,5,0]]
 	candidate = q(i)
 	print(candidate)
 

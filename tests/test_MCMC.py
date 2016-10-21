@@ -47,11 +47,9 @@ class TestMcmc(unittest.TestCase):
     	grid = [[1.0,4.0],[3.0,7.0],[14.0,28.0]]
     	graph = [[0,1,1],[1,0,1],[1,1,0]]
     	candidate = MCMC.q(graph, grid)
-    	val = 0
+    	val = False
     	if candidate[0,0] == 0 or candidate[1,0] == 0 or candidate[2,0]==0:
     		val = True 
-    	else:
-    		val = False 
     	self.assertTrue(val)
 
 
