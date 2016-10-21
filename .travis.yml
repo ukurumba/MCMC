@@ -19,6 +19,7 @@ install:
 - pip install codecov
 - pip install numpy 
 - pip install coverage
+- pip install networkx
 
 # command to run tests, e.g. python setup.py test
 script: 

@@ -28,6 +28,13 @@ class TestMcmc(unittest.TestCase):
     def test_000_something(self):
         pass
 
+    def test_initialization(self):
+    	grid = [[1,2],[1,9],[5,9],[2,3]]
+    	init_graph = MCMC.initialization(grid)
+    	val = np.allclose(init_graph,np.transpose(init_graph))
+    	self.assertTrue(val)
+
+
     def test_candidate_symmetry(self):
     	Current_graph = [[0,1,1],[1,0,0],[1,0,0]]
     	grid = [[1.0,4.0],[3.0,7.0],[14.0,28.0]]
@@ -45,8 +52,9 @@ class TestMcmc(unittest.TestCase):
     def test_actual_change(self):
     	Current_graph = [[0,1,1],[1,0,0],[1,0,0]]
     	grid = [[1.0,4.0],[3.0,7.0],[14.0,28.0]]
-    	candidate = MCMC.q(Current_graph)
-    	np.assertNotEqual(candidate-Current_graph,np.zeroes((3,3)))
+    	candidate = MCMC.q(Current_graph,grid)
+    	val = np.array_equal(Current_graph,candidate)
+    	self.assertFalse(val)
 
     def test_theta(self):
     	Current_graph = [[0,1,1],[1,0,0],[1,0,0]]

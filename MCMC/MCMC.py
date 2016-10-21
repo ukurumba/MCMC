@@ -1,5 +1,27 @@
 # -*- coding: utf-8 -*-
 import numpy as np 
+import networkx as nx
+
+def initialization(grid):
+	"""This function takes in the 2-D grid given as input and returns an initial graph."""
+	grid = np.asarray(grid)
+	graph = np.zeros((len(grid),len(grid)))
+	for i in range(0,len(grid),1):
+		for j in range(0,len(grid),1):
+			graph[i,j] = np.sqrt((grid[i,0] - grid[j,0])**2 + (grid[i,1]-grid[j,1])**2)
+	return graph
+
+def connected(i,rand_i,rand_j):
+	graph = list(i)
+	graph = np.asarray(graph)
+	if graph[rand_i,rand_j] == 0:
+		graph[rand_i,rand_j] = 1
+		graph[rand_j,rand_i] = 1
+	elif graph[rand_i,rand_j] != 0:
+		graph[rand_i,rand_j] = 0
+		graph[rand_j,rand_i] = 0
+	graph = nx.from_numpy_matrix(graph)
+	return(nx.is_connected(graph))
 
 def q(i,grid):
 	"""This function returns a candidate state given the state that the Markov chain is currently in. 
@@ -23,33 +45,29 @@ def q(i,grid):
 	-------
 	candidate : array
 		candidate is the candidate state based on the decision calculus intrinsic to q."""
-	
-	i = np.array(i)
+
 	grid = np.array(grid)
-	candidate = i[:]
+	candidate = list(i)
+	candidate = np.asarray(candidate)
 	rand_i = np.random.randint(len(i))
 	rand_j = np.random.randint(len(i))
 
-	while rand_i == rand_j: # or is_connected(rand_i,rand_j) == false: 
-	    rand_i = np.random.randint(len(i))
-	    rand_j = np.random.randint(len(i))
-
-	    
+	while rand_i == rand_j or connected(candidate,rand_i,rand_j) == False:
+		rand_i = np.random.randint(len(i))
+		rand_j = np.random.randint(len(i))
+		
+	
 	if candidate[rand_i,rand_j] != 0:
-	    candidate[rand_i,rand_j] = 0
-	    candidate[rand_j,rand_i] = 0
+		candidate[rand_i,rand_j] = 0
+		candidate[rand_j,rand_i] = 0
 
-	    
+		
 	elif candidate[rand_j,rand_i] == 0:
-	    weight_i_j = np.sqrt((grid[rand_i,0] - grid[rand_j,0])**2 + (grid[rand_i,1]-grid[rand_j,1])**2)
-	    candidate[rand_i,rand_j] = weight_i_j
-	    candidate[rand_j,rand_i] = weight_i_j
+		weight_i_j = np.sqrt((grid[rand_i,0] - grid[rand_j,0])**2 + (grid[rand_i,1]-grid[rand_j,1])**2)
+		candidate[rand_i,rand_j] = weight_i_j
+		candidate[rand_j,rand_i] = weight_i_j
 
 	return candidate
-
-
-    
-
 
 
 def theta(i,r=1):
@@ -87,31 +105,31 @@ def theta(i,r=1):
 
 
 
-def dijkstra(i,desired_node):
-	"""An implementation of Dijkstra's shortest path algorithm. 
-	Used pseudocode from http://www.gitta.info/Accessibiliti/en/html/Dijkstra_learningObject1.html."""
-	import math
-	dist = [0]
-	previous = [0]
-	for v in range(1,len(i),1):
-	    dist.append(math.inf)
-	    previous.append(0)
+# def dijkstra(i,desired_node):
+# 	"""An implementation of Dijkstra's shortest path algorithm. 
+# 	Used pseudocode from http://www.gitta.info/Accessibiliti/en/html/Dijkstra_learningObject1.html."""
+# 	import math
+# 	dist = [0]
+# 	previous = [0]
+# 	for v in range(1,len(i),1):
+# 	    dist.append(math.inf)
+# 	    previous.append(0)
 
-	Q = []
-	for j in range(0,len(i),1):
-	    Q.append(j)
+# 	Q = []
+# 	for j in range(0,len(i),1):
+# 	    Q.append(j)
 
-	while len(Q) != 0:
-	    dist_u = min(dist)
-	    u = dist.index(min(dist))
-	    Q.remove(u)
-	    alt = 0
-	    for v in Q:
-	        alt = dist_u + i[u,v]
-	        if alt < dist[v]:
-	            dist[v] = alt
-	            previous[v] = u
-	return previous
+# 	while len(Q) != 0:
+# 	    dist_u = min(dist)
+# 	    u = dist.index(min(dist))
+# 	    Q.remove(u)
+# 	    alt = 0
+# 	    for v in Q:
+# 	        alt = dist_u + i[u,v]
+# 	        if alt < dist[v]:
+# 	            dist[v] = alt
+# 	            previous[v] = u
+# 	return previous
 
 
 def probability(i,j,T=1):
@@ -172,7 +190,7 @@ def next_state(i,j,probability):
 	state : integer
 		the state chosen"""
 
-	
+
 
 def iterator(i,eq_distrib,N):
 	"""This is the main body of the implemented algorithm. This ignores the burn-off at the beginning of the simulation.
