@@ -29,6 +29,7 @@ class TestMcmc(unittest.TestCase):
         pass
 
     def test_initialization(self):
+        #verifies that the initial graph is symmetric
     	grid = [[1,2],[1,9],[5,9],[2,3]]
     	init_graph = MCMC.initialization(grid)
     	val = np.allclose(init_graph,np.transpose(init_graph))
@@ -69,6 +70,7 @@ class TestMcmc(unittest.TestCase):
         j = np.array([[0,1,1],[1,0,1],[1,1,0]])
         self.assertEqual((1/3)/(np.exp(2.0)),MCMC.probability(i,j))
         self.assertEqual(1.0,MCMC.probability(j,i))
+
 
 
 
