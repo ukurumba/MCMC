@@ -50,15 +50,7 @@ class TestMcmc(unittest.TestCase):
     	val = False
     	if candidate[0,0] == 0 or candidate[1,0] == 0 or candidate[2,0]==0:
     		val = True 
-    	self.assertTrue(val)
-
-
-    # def test_candidate_connected(self):
-    # 	Current_graph = [[0,1,1],[1,0,0],[1,0,0]]
-    # 	grid = [[1.0,4.0],[3.0,7.0],[14.0,28.0]]
-    # 	States = np.array([0,1,2])
-    # 	candidate = MCMC.q(Current_graph,grid)
-    	
+    	self.assertTrue(val)  	
 
     def test_actual_change(self):
     	Current_graph = [[0,1,1],[1,0,0],[1,0,0]]
@@ -68,8 +60,17 @@ class TestMcmc(unittest.TestCase):
     	self.assertFalse(val)
 
     def test_theta(self):
-    	Current_graph = [[0,1,1],[1,0,0],[1,0,0]]
-    	States = np.array([0,1,2])
+        Current_graph = [[0,1,1],[1,0,0],[1,0,0]]
+        prob = MCMC.theta(Current_graph)
+        self.assertEqual(prob,6)
+
+    def test_probability(self):
+        i = np.array([[0,1,1],[1,0,0],[1,0,0]])
+        j = np.array([[0,1,1],[1,0,1],[1,1,0]])
+        self.assertEqual((1/3)/(np.exp(2.0)),MCMC.probability(i,j))
+        self.assertEqual(1.0,MCMC.probability(j,i))
+
+
 
 
 
