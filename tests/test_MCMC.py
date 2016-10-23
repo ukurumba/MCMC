@@ -71,6 +71,22 @@ class TestMcmc(unittest.TestCase):
         self.assertEqual((1/3)/(np.exp(2.0)),MCMC.probability(i,j))
         self.assertEqual(1.0,MCMC.probability(j,i))
 
+    def test_state_generator(self):
+        i = np.array([[0,1,1],[1,0,0],[1,0,0]])
+        j = np.array([[0,1,1],[1,0,1],[1,1,0]])
+        for val in range(0,50):
+            next_state = MCMC.next_state(i,j,MCMC.probability(i,j))
+            next_state = MCMC.next_state(i,j,MCMC.probability(i,j))
+            next_state = MCMC.next_state(i,j,MCMC.probability(i,j))
+            next_state = MCMC.next_state(i,j,MCMC.probability(i,j))
+            if np.allclose(next_state,j == True): 
+                break 
+        if np.allclose(i,next_state) or np.allclose(j,next_state) == True:
+            value = True
+        self.assertTrue(value) 
+
+
+
 
 
 

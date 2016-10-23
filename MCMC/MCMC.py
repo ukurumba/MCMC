@@ -212,31 +212,43 @@ def cut_edges(i):
     return cut_edges/2 # o/w we will double count number of cut edges
 
 
-# def next_state(i,j,probability):
-#   """ This function returns the next state using functions already defined.
+def next_state(i,j,probability):
+    """ This function returns the next state using functions already defined.
 
-#   Example
-#   -------
+    Example
+    -------
 
-#   state = next_state(2,3,.4)
+    state = next_state(2,3,.4)
 
-#   Parameters
-#   ----------
+    Parameters
+    ----------
 
-#   i : integer
-#       the current state
+    i : integer
+      the current state
+
+    j : integer
+      the candidate state
+
+    probability : float
+      the probability that state j is selected
+
+    Output 
+    ------
+
+    state : integer
+      the state chosen"""
+
+    #using a random number generator to generate a random number.
+    u = np.random.uniform(0.0,1.0)
     
-#   j : integer
-#       the candidate state
+    #calculating new state based on Metropolis-Hastings algorithm specifications:
+    if u > probability: 
+        new_state = i
+    elif u <= probability:
+        new_state = j
+        
+    return new_state
 
-#   probability : float
-#       the probability that state j is selected
-
-#   Output 
-#   ------
-
-#   state : integer
-#       the state chosen"""
 
 
 
