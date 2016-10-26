@@ -101,38 +101,10 @@ def theta(i,r=1):
     partial_weight = 0
     for v in range(0,len(i),1):
         path = nx.shortest_path(graph,0,v)
+        # path is a set of nodes inclusive of end pts. Thus, len(path)-1 = number of edges in our path of interest.
         for node in range(0,len(path)-1,1):
             partial_weight += i[path[node],path[node+1]]
     return(r * total_weight + partial_weight)
-
-
-
-# def dijkstra(i,desired_node):
-#   """An implementation of Dijkstra's shortest path algorithm. 
-#   Used pseudocode from http://www.gitta.info/Accessibiliti/en/html/Dijkstra_learningObject1.html."""
-#   import math
-#   dist = [0]
-#   previous = [0]
-#   for v in range(1,len(i),1):
-#       dist.append(math.inf)
-#       previous.append(0)
-
-#   Q = []
-#   for j in range(0,len(i),1):
-#       Q.append(j)
-
-#   while len(Q) != 0:
-#       dist_u = min(dist)
-#       u = dist.index(min(dist))
-#       Q.remove(u)
-#       alt = 0
-#       for v in Q:
-#           alt = dist_u + i[u,v]
-#           if alt < dist[v]:
-#               dist[v] = alt
-#               previous[v] = u
-#   return previous
-
 
 def probability(i,j,T=1):
     """This function computes the probability that the candidate state will be selected.
@@ -252,40 +224,288 @@ def next_state(i,j,probability):
 
 
 
-# def iterator(i,eq_distrib,N):
-#   """This is the main body of the implemented algorithm. This ignores the burn-off at the beginning of the simulation.
+# def iterator(grid,N):
+#     """This is the main body of the implemented algorithm. 
 
-#   Example
-#   -------
-#   n = (0,1,2)
-#   eq_distrib = (.4,.5,.1)
-#   N = 1000
-#   i = 2
-#   X, P = iterator(i,eq_distrib,N)
-#   print(X)
-#   print(P)
+#     Example
+#     -------
+#     grid = [(1,2),(7,8),(12,13),(4,5),(6,3)(2,20)]
+#     iterator(grid,1000)
+#     print(X)
+#     print(P)
 
-#   Parameters
-#   ----------
+#     Parameters
+#     ----------
 
-#   i : integer
-#       the first state of the particle
+#     grid : list of tuples
+#       the x and y coordinates of all the different nodes in the graph
 
-#   eq_distrib : 1-D array
-#       the equilibrium probability distribution of the n states in the state space
+#     N : int
+#         the number of iterations desired
 
-#   N : the number of iterations desired
+#     Output
+#     ------
 
-#   Output
-#   ------
-
-#   X : array of integers
+#     X : array of integers
 #       the record of all the states the Markov chain took
-#   P : nxn array of floats
-#       the transition probability matrix.
-#       """
+#     P : nxn array of floats
+#       the transition probability matrix."""
 
-#   import numpy as np
+#     with open ('MCMC_output.txt','w') as output_file:
+#         import numpy as np
+#         initial_graph = initialization(grid)
+#         new_state = initial_graph
+#         output_file.write('{}' .format(initial_graph))
+
+
+#         for i in range(0,N,1):
+#             number_edges = 0
+#             #generate candidate graph and pick between it and current graph
+#             candidate_graph = q(initial_graph,grid)
+#             switching_likelihood = probability(new_state,candidate_graph)
+#             new_state = next_state(new_state,candidate_graph,switching_likelihood)            
+#             output_file.write('{}'.format(new_state))
+
+def expected_connect_to_0(grid,N):
+    """ This function returns the arithmetic mean number of edges that are connected to the 0 node given an input grid. This should 
+    approximate the expected number of edges of this type quite well if N is large.
+    Example
+    -------
+
+    grid = [(12,17),(13,19),(34,69),(34,12)]
+    number_edges = MCMC.expected_connect_to_0(grid,1000)
+
+    Parameters
+    ----------
+
+    grid : list of tuples
+      the x and y coordinates of all the different nodes in the graph. The 1st entry should be the all-important "0" node, while
+      the rest of them can be in any arbitrary order.
+
+    N : int
+        the number of iterations desired.
+
+    Output
+    ------
+    
+    number_edges : float
+    The expected number of edges that connect to the 0 node."""
+
+    import numpy as np
+    initial_graph = initialization(grid)
+    new_state = initial_graph
+    number_edges = 0
+
+
+    for i in range(N):
+        #generating next graph
+        candidate_graph = q(new_state,grid)
+        switching_likelihood = probability(new_state,candidate_graph)
+        new_state = next_state(new_state,candidate_graph,switching_likelihood)
+
+        #computing number connections to 0
+        for i in range(len(new_state)):
+            if new_state[0,i] != 0: 
+                number_edges += 1
+
+    #computing average
+    return number_edges / N
+
+def expected_number_edges(grid,N):
+    """ This function returns the arithmetic mean number of edges in the graph. This should 
+    approximate the expected number of edges of this type quite well if N is large.
+    Example
+    -------
+
+    grid = [(12,17),(13,19),(34,69),(34,12)]
+    number_edges = MCMC.expected_number_edges(grid,1000)
+
+    Parameters
+    ----------
+
+    grid : list of tuples
+      the x and y coordinates of all the different nodes in the graph. The 1st entry should be the all-important "0" node, while
+      the rest of them can be in any arbitrary order.
+
+    N : int
+        the number of iterations desired.
+
+    Output
+    ------
+    
+    number_edges : float
+    The expected number of edges in a graph."""
+
+    import numpy as np
+    initial_graph = initialization(grid)
+    new_state = initial_graph
+    number_edges = 0
+
+
+    for i in range(N):
+        #generating next graph
+        candidate_graph = q(new_state,grid)
+        switching_likelihood = probability(new_state,candidate_graph)
+        new_state = next_state(new_state,candidate_graph,switching_likelihood)
+
+        #computing number connections to 0
+        for i in range(len(new_state)):
+            for j in range(len(new_state)):
+                if new_state[i,j] != 0: 
+                    number_edges += 1
+
+    #computing average
+    return number_edges / ( 2 * N )
+
+def expected_furthest_from_0(grid,N):
+    """This function returns the arithmetic mean number of edges between the 0 node and the node that is the furthest from 0. 
+    This should approximate the actual expected number of edges in this path as N gets large.
+
+    Example
+    -------
+
+    grid = [(12,17),(13,19),(34,69),(34,12)]
+    number_edges = MCMC.expected_furthest_from_0(grid,1000)
+
+    Parameters
+    ----------
+
+    grid : list of tuples
+        the x and y coordinates of all the different nodes in the graph. The 1st entry should be the all-important "0" node, while
+        the rest of them can be in any arbitrary order.
+
+    N : int
+        the number of iterations desired.
+
+    Output
+    ------
+
+    number_edges : float
+    The expected number of edges in the shortest path between 0 and the vertex furthest from 0."""
+
+    import numpy as np
+    initial_graph = initialization(grid)
+    new_state = initial_graph
+    number_edges = 0
+
+    #calculating and storing longest "shortest path" from 0
+    overall_path = 0
+    nx_graph = nx.from_numpy_matrix(new_state)
+    for node in range(len(initial_graph)):
+        path =  len(nx.shortest_path(nx_graph,0,node))
+        if path > overall_path:
+            overall_path = path
+
+    #recall this is an edge path, and networkx returns a node path, so we subtract one to get the number of edges
+    overall_path = overall_path - 1
+
+
+    for i in range(N):
+        #generating next graph
+        candidate_graph = q(new_state,grid)
+        switching_likelihood = probability(new_state,candidate_graph)
+        new_state = next_state(new_state,candidate_graph,switching_likelihood)
+
+        #computing shortest paths from 0 to each node and selecting the largest of them
+        nx_graph = nx.from_numpy_matrix(new_state)
+        largest_path = 0
+        for node in range(len(candidate_graph)):
+            path = len(nx.shortest_path(nx_graph,0,node))
+            if path > largest_path:
+                largest_path = path 
+
+        #adding the largest path's edge length to the overall total
+        overall_path += largest_path - 1
+
+    return overall_path / N
+
+def most_likely_graphs(grid,percentage,N):
+    """This function returns the most likely graphs ordered from most to least. The amount of returned graphs depends on the input percentage.
+    Example
+    -------
+
+    grid = [(12,17),(13,19),(34,69),(34,12)]
+    graphs = MCMC.most_likely_graphs(grid,.01,1000)
+
+    Parameters
+    ----------
+
+    grid : list of tuples
+      the x and y coordinates of all the different nodes in the graph. The 1st entry should be the all-important "0" node, while
+      the rest of them can be in any arbitrary order.
+
+    percentage : float
+        the percentage of different graphs travelled that you would like returned. e.g. .01 returns the 1% of most likely graphs.
+
+    N : int
+        the number of iterations desired.
+
+    Output
+    ------
+
+    graphs : list
+        a list of most likely graphs ordered from most to least likely (of the top given percentage of course). Each graph is
+        itself a list."""
+
+    initial_graph = initialization(grid)
+    new_state = initial_graph
+    graphs = []
+    counter = []
+
+
+    for i in range(N):
+        #generating next graph
+        candidate_graph = q(new_state,grid)
+        switching_likelihood = probability(new_state,candidate_graph)
+        new_state = next_state(new_state,candidate_graph,switching_likelihood)
+
+        #check if the graph is already in the list. if not, append it to the list
+        identical_graph_found = False
+        for graph in range(len(graphs)):
+
+            if np.allclose(graphs[graph],new_state) == True: 
+                counter[graph] += 1
+                identical_graph_found = True
+
+        if identical_graph_found == False:
+            graphs.append(new_state)
+            counter.append(1)
+
+    #calculating number of graphs to return
+    uniques = len(counter)
+    returned = int(uniques * percentage)
+    if returned == 0:
+        returned = 1 
+
+    #sorting by counter value and selecting the correct graphs
+    #source for zipping: http://stackoverflow.com/questions/6618515/sorting-list-based-on-values-from-another-list
+    graph_and_counter = zip(counter,graphs)
+    likely_graphs = [graph for counter, graph in sorted(graph_and_counter,reverse = True, key = lambda count: count[0])]    
+    return likely_graphs[:returned]
+        
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

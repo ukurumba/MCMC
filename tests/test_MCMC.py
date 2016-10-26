@@ -12,6 +12,7 @@ Tests for `MCMC` module.
 import sys
 import unittest
 import numpy as np
+import networkx as nx
 
 from MCMC import MCMC
 
@@ -83,7 +84,34 @@ class TestMcmc(unittest.TestCase):
                 break 
         if np.allclose(i,next_state) or np.allclose(j,next_state) == True:
             value = True
-        self.assertTrue(value) 
+        self.assertTrue(value)
+
+    def test_expected_edges(self):
+        grid = [(1,3),(4,5),(3,6),(3,9)]
+        val = MCMC.expected_number_edges(grid,25)
+        self.assertIsInstance(val, float)
+
+    def test_expected_connections_to_0(self):
+        grid = [(1,3),(4,5),(3,6),(3,9)]
+        val_2 = MCMC.expected_connect_to_0(grid,25)
+        self.assertIsInstance(val_2, float)
+
+    def test_longest_path(self):
+        grid = [(1,3),(4,5),(3,6),(3,9)]
+        val_2 = MCMC.expected_furthest_from_0(grid,25)
+        self.assertIsInstance(val_2,float)
+
+    def test_graphs_returned(self):
+        grid = [(1,3),(4,5),(3,6),(3,9),(12,13),(18,27),(48,32),(2,14),(58,36)]
+        graph = MCMC.most_likely_graphs(grid,.01,25)
+        nx_graph = nx.from_numpy_matrix(graph[0])
+        connectedness = nx.is_connected(nx_graph)
+        symmetry = np.allclose(graph[0],np.transpose(graph[0]))
+        self.assertTrue(connectedness)
+        self.assertTrue(symmetry)
+
+
+        
 
 
 
