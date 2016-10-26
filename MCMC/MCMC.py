@@ -86,8 +86,11 @@ def theta(i,r=1):
     i : MxM array
         This is the current state represented in an MxM adjacency matrix.
 
-    grid : Mx2 array
-        This is the array of x and y values in Cartesian space for the given index/label (i.e. the individual column headers in the 'i array.')
+    grid : Mx2 list of tuples
+        This is the list of x and y values in Cartesian space for the given index/label (i.e. the individual column headers in the 'i array.')
+
+    r : float (optional)
+        adjustable parameter to improve specificity of intrinsic probability distribution.
 
     Output
     ------
@@ -106,7 +109,7 @@ def theta(i,r=1):
             partial_weight += i[path[node],path[node+1]]
     return(r * total_weight + partial_weight)
 
-def probability(i,j,T=1):
+def probability(i,j,T=1,r=1):
     """This function computes the probability that the candidate state will be selected.
 
     Example
@@ -125,8 +128,11 @@ def probability(i,j,T=1):
     j : MxM array
       This is the candidate graph represented by its adjacency matrix.
 
-    T : float
-      This is a parameter that can be tuned to improve the MCMC efficiency.
+    T : float (optional)
+        adjustable parameter to improve specificity of intrinsic probability distribution.
+
+    r : float (optional)
+        adjustable parameter to improve specificity of intrinsic probability distribution.
 
     Output
     ------
@@ -135,8 +141,8 @@ def probability(i,j,T=1):
       This is the probability that the candidate graph is selected. It takes values on [0,1]."""
 
     #collecting different variables in probability calculation
-    theta_i = theta(i)
-    theta_j = theta(j)
+    theta_i = theta(i,r)
+    theta_j = theta(j,r)
     number_of_potential_edges = len(i) * (len(i) - 1) / 2
     cut_edges_i = cut_edges(i)
     cut_edges_j = cut_edges(j)
@@ -262,11 +268,11 @@ def next_state(i,j,probability):
 #             number_edges = 0
 #             #generate candidate graph and pick between it and current graph
 #             candidate_graph = q(initial_graph,grid)
-#             switching_likelihood = probability(new_state,candidate_graph)
+#             switching_likelihood = probability(new_state,candidate_graph,T,r)
 #             new_state = next_state(new_state,candidate_graph,switching_likelihood)            
 #             output_file.write('{}'.format(new_state))
 
-def expected_connect_to_0(grid,N):
+def expected_connect_to_0(grid,N,T=1,r=1):
     """ This function returns the arithmetic mean number of edges that are connected to the 0 node given an input grid. This should 
     approximate the expected number of edges of this type quite well if N is large.
     Example
@@ -285,6 +291,12 @@ def expected_connect_to_0(grid,N):
     N : int
         the number of iterations desired.
 
+    T : float (optional)
+        adjustable parameter to improve specificity of intrinsic probability distribution.
+
+    r : float (optional)
+        adjustable parameter to improve specificity of intrinsic probability distribution.
+
     Output
     ------
     
@@ -300,7 +312,7 @@ def expected_connect_to_0(grid,N):
     for i in range(N):
         #generating next graph
         candidate_graph = q(new_state,grid)
-        switching_likelihood = probability(new_state,candidate_graph)
+        switching_likelihood = probability(new_state,candidate_graph,T,r)
         new_state = next_state(new_state,candidate_graph,switching_likelihood)
 
         #computing number connections to 0
@@ -311,7 +323,7 @@ def expected_connect_to_0(grid,N):
     #computing average
     return number_edges / N
 
-def expected_number_edges(grid,N):
+def expected_number_edges(grid,N,T=1,r=1):
     """ This function returns the arithmetic mean number of edges in the graph. This should 
     approximate the expected number of edges of this type quite well if N is large.
     Example
@@ -330,6 +342,13 @@ def expected_number_edges(grid,N):
     N : int
         the number of iterations desired.
 
+    T : float (optional)
+        adjustable parameter to improve specificity of intrinsic probability distribution.
+
+    r : float (optional)
+        adjustable parameter to improve specificity of intrinsic probability distribution.
+
+
     Output
     ------
     
@@ -345,7 +364,7 @@ def expected_number_edges(grid,N):
     for i in range(N):
         #generating next graph
         candidate_graph = q(new_state,grid)
-        switching_likelihood = probability(new_state,candidate_graph)
+        switching_likelihood = probability(new_state,candidate_graph,T,r)
         new_state = next_state(new_state,candidate_graph,switching_likelihood)
 
         #computing number connections to 0
@@ -357,7 +376,7 @@ def expected_number_edges(grid,N):
     #computing average
     return number_edges / ( 2 * N )
 
-def expected_furthest_from_0(grid,N):
+def expected_furthest_from_0(grid,N,T=1,r=1):
     """This function returns the arithmetic mean number of edges between the 0 node and the node that is the furthest from 0. 
     This should approximate the actual expected number of edges in this path as N gets large.
 
@@ -376,6 +395,12 @@ def expected_furthest_from_0(grid,N):
 
     N : int
         the number of iterations desired.
+
+    T : float (optional)
+        adjustable parameter to improve specificity of intrinsic probability distribution.
+
+    r : float (optional)
+        adjustable parameter to improve specificity of intrinsic probability distribution.
 
     Output
     ------
@@ -403,7 +428,7 @@ def expected_furthest_from_0(grid,N):
     for i in range(N):
         #generating next graph
         candidate_graph = q(new_state,grid)
-        switching_likelihood = probability(new_state,candidate_graph)
+        switching_likelihood = probability(new_state,candidate_graph,T,r)
         new_state = next_state(new_state,candidate_graph,switching_likelihood)
 
         #computing shortest paths from 0 to each node and selecting the largest of them
@@ -419,7 +444,7 @@ def expected_furthest_from_0(grid,N):
 
     return overall_path / N
 
-def most_likely_graphs(grid,percentage,N):
+def most_likely_graphs(grid,percentage,N,T=1,r=1):
     """This function returns the most likely graphs ordered from most to least. The amount of returned graphs depends on the input percentage.
     Example
     -------
@@ -440,6 +465,12 @@ def most_likely_graphs(grid,percentage,N):
     N : int
         the number of iterations desired.
 
+    T : float (optional)
+        adjustable parameter to improve specificity of intrinsic probability distribution.
+
+    r : float (optional)
+        adjustable parameter to improve specificity of intrinsic probability distribution.
+
     Output
     ------
 
@@ -456,7 +487,7 @@ def most_likely_graphs(grid,percentage,N):
     for i in range(N):
         #generating next graph
         candidate_graph = q(new_state,grid)
-        switching_likelihood = probability(new_state,candidate_graph)
+        switching_likelihood = probability(new_state,candidate_graph,T,r)
         new_state = next_state(new_state,candidate_graph,switching_likelihood)
 
         #check if the graph is already in the list. if not, append it to the list
