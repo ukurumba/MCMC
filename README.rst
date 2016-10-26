@@ -18,6 +18,7 @@ Using an innate probability function and the Metropolis-Hastings algorithm for M
 
 - Expected number of connections to the 0 node.
 :: 
+
 	grid = [(1,2),(3,4),(5,6)]
 	MCMC.expected_connect_to_0(grid,1000,T=0.5)
 
@@ -27,25 +28,28 @@ Using an innate probability function and the Metropolis-Hastings algorithm for M
 	grid = [(1,2),(3,4),(5,6)]
 	MCMC.expected_number_edges(grid,1000,T=0.5)
 
-- Expected path length of shortest path between 0 node and node furthest from 0 (i.e. longest 'shortest path' in the network)
+- Expected path length of shortest path between 0 node and node furthest from 0 (i.e. longest 'shortest path' in the network).
 ::
 
 	grid = [(1,2),(3,4),(5,6)]
 	MCMC.expected_furthest_from_0(grid,1000,T=0.5)
 
-- The most likely graphs given the innate probability distribution
+- The most likely graphs given the innate probability distribution.
 ::
 
 	grid = [(1,2),(3,4),(5,6)]
 	MCMC.most_likely_graphs(grid,0.01,1000,T=0.5)
 
-See .. _Documentation: https://github.com/ukurumba/MCMC/blob/master/docs/usage.rst for detailed advice on how to use each function.
+See _Documentation for detailed advice on how to use each function.
+
+.. _Documentation: https://github.com/ukurumba/MCMC/blob/master/docs/usage.rst 
 
 Details
 -------
 
 * Free software: MIT license
-* .. _Documentation: https://
+* _Docs : https://github.com/ukurumba/MCMC/blob/master/docs/usage.rst
+.. _Documentation: https://https://github.com/ukurumba/MCMC/blob/master/docs/usage.rst
 
 
 Features

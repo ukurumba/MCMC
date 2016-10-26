@@ -47,7 +47,7 @@ Available Functions
     number_edges : float
     The expected number of edges that connect to the 0 node."""
 
-- Expected number of total edges in a graph.
+- Expected number of total edges in a graph:
 ::
 
 	help(MCMC.expected_number_edges)
