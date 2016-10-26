@@ -3,23 +3,70 @@ import numpy as np
 import networkx as nx
 
 def initialization(grid):
-    """This function takes in the 2-D grid given as input and returns an initial graph."""
+    """This function takes in the 2-D grid given as input and returns an initial graph.
+    Example
+    -------
+
+    grid = [(1,2),(3,4),(5,6)]
+    initial_graph = initialization(grid)
+
+    Parameters
+    ----------
+
+    grid : list of tuples
+        the input list of tuples 
+
+    Output
+    ------
+
+    graph : M x M numpy array (M is the number of tuples in grid)
+        a weighted adjacency matrix for the graph generated from the list of tuples"""
+
     grid = np.asarray(grid)
     graph = np.zeros((len(grid),len(grid)))
+
     for i in range(0,len(grid),1):
         for j in range(0,len(grid),1):
-            graph[i,j] = np.sqrt((grid[i,0] - grid[j,0])**2 + (grid[i,1]-grid[j,1])**2)
+            graph[i,j] = np.sqrt((grid[i,0] - grid[j,0])**2 + (grid[i,1]-grid[j,1])**2) #Euclidean distance between two points
     return graph
 
 def connected(i,rand_i,rand_j):
+    """This function tests whether a given graph will still be connected if the proposed replacement is made. The proposed 
+    replacement represents changing the position at rand_i,rand_j to 0 if it is non-0 and changing it to non-0 if it is 0.
+
+    Example
+    -------
+    i = [[0,1,1],[1,0,0],[1,0,0]]
+    proposed_index_1_change = 1
+    proposed_index_2_change = 2
+    connected(i,proposed_index_1_change,proposed_index_2_change)
+
+    Parameters
+    ----------
+
+    i : M x M numpy array (where M is the number of tuples in the initial grid)
+    rand_i : int
+        index 1 value
+    rand_j : int
+        index 2 value
+
+    Output
+    ------
+    truth_value : boolean
+        whether the proposed graph would be connected or not"""
+
     graph = list(i)
     graph = np.asarray(graph)
+
+    #testing to see if the proposed position change is 0 or not 0 and setting it to the opposite of what it currently is
     if graph[rand_i,rand_j] == 0:
         graph[rand_i,rand_j] = 1
         graph[rand_j,rand_i] = 1
     elif graph[rand_i,rand_j] != 0:
         graph[rand_i,rand_j] = 0
         graph[rand_j,rand_i] = 0
+
+    #using networkx's is_connected feature to discern connectedness
     graph = nx.from_numpy_matrix(graph)
     return(nx.is_connected(graph))
 
@@ -52,11 +99,12 @@ def q(i,grid):
     rand_i = np.random.randint(len(i))
     rand_j = np.random.randint(len(i))
 
+    #following while loop ensures that the candidate graph is connected and does not contain self-loops
     while rand_i == rand_j or connected(candidate,rand_i,rand_j) == False:
         rand_i = np.random.randint(len(i))
         rand_j = np.random.randint(len(i))
         
-    
+    #generating candidate graph by replacing index rand_i,rand_j 
     if candidate[rand_i,rand_j] != 0:
         candidate[rand_i,rand_j] = 0
         candidate[rand_j,rand_i] = 0
@@ -167,6 +215,24 @@ def probability(i,j,T=1,r=1):
 
 
 def cut_edges(i):
+    '''This function counts the number of edges that if removed (set equal to 0) would cause the graph to be disconnected.
+
+    Example
+    -------
+
+    i = [[0,1],[1,0]]
+    cut_edges(i)
+
+    Parameters
+    ----------
+
+    i : M x M numpy array (where M is the number of tuples in the initial grid)
+
+    Output
+    ------
+
+    cut_edges : int
+        number of such edges as described earlier in the docstring.'''
 
     #creating a numpy_matrix we can play around with w/o affecting our original
     i = np.array(i)
@@ -195,16 +261,19 @@ def next_state(i,j,probability):
 
     Example
     -------
+    
+    i = [[0,1,1],[1,0,0],[1,0,0]]
+    j = [[0,1,1],[1,0,1],[1,1,0]]
 
-    state = next_state(2,3,.4)
+    state = next_state(i,j,.4)
 
     Parameters
     ----------
 
-    i : integer
+    i : M x M numpy array (where M is the number of tuples in the initial grid)
       the current state
 
-    j : integer
+    j : M x M numpy array
       the candidate state
 
     probability : float
@@ -213,7 +282,7 @@ def next_state(i,j,probability):
     Output 
     ------
 
-    state : integer
+    state : M x M numpy array 
       the state chosen"""
 
     #using a random number generator to generate a random number.
@@ -226,51 +295,6 @@ def next_state(i,j,probability):
         new_state = j
         
     return new_state
-
-
-
-
-# def iterator(grid,N):
-#     """This is the main body of the implemented algorithm. 
-
-#     Example
-#     -------
-#     grid = [(1,2),(7,8),(12,13),(4,5),(6,3)(2,20)]
-#     iterator(grid,1000)
-#     print(X)
-#     print(P)
-
-#     Parameters
-#     ----------
-
-#     grid : list of tuples
-#       the x and y coordinates of all the different nodes in the graph
-
-#     N : int
-#         the number of iterations desired
-
-#     Output
-#     ------
-
-#     X : array of integers
-#       the record of all the states the Markov chain took
-#     P : nxn array of floats
-#       the transition probability matrix."""
-
-#     with open ('MCMC_output.txt','w') as output_file:
-#         import numpy as np
-#         initial_graph = initialization(grid)
-#         new_state = initial_graph
-#         output_file.write('{}' .format(initial_graph))
-
-
-#         for i in range(0,N,1):
-#             number_edges = 0
-#             #generate candidate graph and pick between it and current graph
-#             candidate_graph = q(initial_graph,grid)
-#             switching_likelihood = probability(new_state,candidate_graph,T,r)
-#             new_state = next_state(new_state,candidate_graph,switching_likelihood)            
-#             output_file.write('{}'.format(new_state))
 
 def expected_connect_to_0(grid,N,T=1,r=1):
     """ This function returns the arithmetic mean number of edges that are connected to the 0 node given an input grid. This should 

@@ -39,8 +39,7 @@ Using an innate probability function and the Metropolis-Hastings algorithm for M
 	grid = [(1,2),(3,4),(5,6)]
 	MCMC.most_likely_graphs(grid,0.01,1000,T=0.5)
 
-
-
+See .. _Documentation: https://github.com/ukurumba/MCMC/blob/master/docs/usage.rst for detailed advice on how to use each function.
 
 Details
 -------
